@@ -65,8 +65,9 @@ CREATE TABLE `certificados_pos_graduacao` (
 
 CREATE TABLE `mensagens_usuario` (
   `id` int(11) NOT NULL,
-  `url_certificado` int(50) NOT NULL,
-  `id_usuario` int(1) NOT NULL
+  `mensagem_usuario` varchar(300) NOT NULL,
+  `assunto` varchar(50) NOT NULL,
+  `id_usuario` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -107,10 +108,10 @@ CREATE TABLE `tb_usuario` (
 --
 
 INSERT INTO `tb_usuario` (`id_usuario`, `nome_completo`, `data_nascimento`, `cpf`, `rg`, `estado_rg`, `email`, `sexo`, `canhoto`, `estado_civil`, `nome_mae`, `nome_pai`, `nacionalidade`, `naturalidade`, `cep`, `rua`, `numero_casa`, `complemento`, `bairro`, `cidade`, `uf`, `senha`, `telefone`, `celular`) VALUES
-(1, 'Maria da Silva', '0000-00-00', '3256556565', 46546541, 'PR', 'mariasil@gmail.com', 'Feminino', 'Não', 'Casada', 'Rosa da Silva', 'Pedro da Silva', 'Brasileira', 'Paraná', 87466667, 'Rua da lua', 74, 'Casa', 'Santo Antonio', 'Carambei ', 'PR', 'd41d8cd98f00b204e9800998ecf8427e', 0, 416699562),
-(2, 'Paulo Soares', '0000-00-00', '06999987581', 116528964, 'SC', 'soares@gmail.com', 'Masculino', 'Sim', 'Solteiro', 'Paulina Soares', 'João Soares', 'Brasileiro', 'Santa Catarina', 84956479, 'Rua das carmelitas', 236, 'Casa', 'Afonso Camargo', 'Portulancia', 'SC', 'd41d8cd98f00b204e9800998ecf8427e', 0, 489984665),
-(3, 'Flora Maria', '0000-00-00', '6975556423', 103336554, 'SP', 'flora@hotmail.com', 'Feminino', 'Sim', 'Solteira', 'Caroline Medeiros', 'Jose Carlos', 'Btrasileira', 'São Paulo', 82697742, 'Rua dodogues', 485, 'Casa', 'Mercedes', 'Moema', 'SP', 'd41d8cd98f00b204e9800998ecf8427e', 98756542, 98756542),
-(4, 'Marcinha Pereira', '0000-00-00', '6984423651', 1036554697, 'RJ', 'Marci@bol.com', 'Feminino', 'Não', 'Divorciada', 'Laisa Junqueira', 'Paulo Pereira', 'Brasileira', 'Rio de Janeiro', 87954687, 'Rua Samanbaia', 98, 'Casa', 'Retro', 'Potiguara', 'RJ', 'd41d8cd98f00b204e9800998ecf8427e', 0, 985445326);
+(1, 'Maria da Silva', '1995-11-14', '3256556565', 46546541, 'PR', 'mariasil@gmail.com', 'Feminino', 'Não', 'Casada', 'Rosa da Silva', 'Pedro da Silva', 'Brasileira', 'Paraná', 87466667, 'Rua da lua', 74, 'Casa', 'Santo Antonio', 'Carambei ', 'PR', 'd41d8cd98f00b204e9800998ecf8427e', 0, 416699562),
+(2, 'Paulo Soares', '1991-05-17', '06999987581', 116528964, 'SC', 'soares@gmail.com', 'Masculino', 'Sim', 'Solteiro', 'Paulina Soares', 'João Soares', 'Brasileiro', 'Santa Catarina', 84956479, 'Rua das carmelitas', 236, 'Casa', 'Afonso Camargo', 'Portulancia', 'SC', 'd41d8cd98f00b204e9800998ecf8427e', 0, 489984665),
+(3, 'Flora Maria', '1989-06-14', '6975556423', 103336554, 'SP', 'flora@hotmail.com', 'Feminino', 'Sim', 'Solteira', 'Caroline Medeiros', 'Jose Carlos', 'Btrasileira', 'São Paulo', 82697742, 'Rua dodogues', 485, 'Casa', 'Mercedes', 'Moema', 'SP', 'd41d8cd98f00b204e9800998ecf8427e', 98756542, 98756542),
+(4, 'Marcinha Pereira', '2000-08-09', '6984423651', 1036554697, 'RJ', 'Marci@bol.com', 'Feminino', 'Não', 'Divorciada', 'Laisa Junqueira', 'Paulo Pereira', 'Brasileira', 'Rio de Janeiro', 87954687, 'Rua Samanbaia', 98, 'Casa', 'Retro', 'Potiguara', 'RJ', 'd41d8cd98f00b204e9800998ecf8427e', 0, 985445326);
 
 --
 -- Indexes for dumped tables
@@ -169,6 +170,90 @@ ALTER TABLE `tb_usuario`
   MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 COMMIT;
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+--Mostre todos os usários
+SELECT * FROM tb_usuario;
+
+-- Mostre a média de idade dos candidatos
+SELECT AVG(YEAR(CURDATE()) - YEAR(data_nascimento)) AS media_idades FROM tb_usuario;
+
+--Candidato por sexo em percentual
+
+SELECT
+    sexo,
+    COUNT(*) as quantidade,
+    (COUNT(*) / (SELECT COUNT(*) FROM tb_usuario)) * 100 AS porcentagem
+FROM
+    tb_usuario
+GROUP BY
+    sexo;
+
+--Quantidade de mensagens de usuários e assunto:
+
+SELECT
+    assunto,
+    COUNT(*) AS quantidade_mensagens
+FROM
+    mensagens_usuario
+GROUP BY
+    assunto;
+
+--Quantidade de candidatos com curso de graduação e pós graduação:
+
+SELECT COUNT(DISTINCT u.id_usuario) AS quantidade_usuarios
+FROM tb_usuario u
+JOIN certificados_graduacao cg ON u.id_usuario = cg.id_usuario
+JOIN certificados_pos_graduacao cpg ON u.id_usuario = cpg.id_usuario;
+
+--Quantidade de usuários que possuem mestrado:
+
+SELECT COUNT(DISTINCT id_usuario) AS quantidade_candidatos_mestrado
+FROM certificados_mestrado;
+
+--Percentual de candidatos com graduação, pós e mestrado:
+
+SELECT
+    (COUNT(DISTINCT cg.id_usuario) / (SELECT COUNT(DISTINCT id_usuario) FROM tb_usuario)) * 100 AS percentual_graduacao,
+    (COUNT(DISTINCT cm.id_usuario) / (SELECT COUNT(DISTINCT id_usuario) FROM tb_usuario)) * 100 AS percentual_mestrado,
+    (COUNT(DISTINCT cpg.id_usuario) / (SELECT COUNT(DISTINCT id_usuario) FROM tb_usuario)) * 100 AS percentual_pos_graduacao
+FROM
+    tb_usuario u
+LEFT JOIN
+    certificados_graduacao cg ON u.id_usuario = cg.id_usuario
+LEFT JOIN
+    certificados_mestrado cm ON u.id_usuario = cm.id_usuario
+LEFT JOIN
+    certificados_pos_graduacao cpg ON u.id_usuario = cpg.id_usuario;
+
+-- Percentual de usuários por cidade e idade
+
+SELECT
+    cidade,
+    idade,
+    (COUNT(*) / total_cidade.total) * 100 AS percentual_por_cidade
+FROM
+    (
+        SELECT
+            u.cidade,
+            YEAR(CURDATE()) - YEAR(u.data_nascimento) AS idade
+        FROM
+            tb_usuario u
+    ) subquery,
+    (
+        SELECT
+            cidade,
+            COUNT(*) AS total
+        FROM
+            tb_usuario
+        GROUP BY
+            cidade
+    ) total_cidade
+GROUP BY
+    cidade, idade
+ORDER BY
+    cidade, idade;
+
+
+
+
+
+
